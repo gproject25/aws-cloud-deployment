@@ -35,3 +35,7 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# Local and Production Configuration
+application-local.yml
+application-prod.yml
