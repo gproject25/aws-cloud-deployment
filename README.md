@@ -12,8 +12,18 @@ AWS 기반의 클라우드 인프라를 설계하고 Spring Boot 애플리케이
 
 ### AWS Budgets
 
-![img.png](images/img.png)
-![img_1.png](images/img_1.png)
+![img.png](images/budget.png)
+![img_1.png](images/budget2.png)
 
 ---
 
+### Level 1. EC2 배포
+
+EC2 퍼블릭 IP: 43.203.254.146
+![ec2instanceIp.png](images/ec2instanceIp.png)
+
+로컬 실행:
+![img_3.png](images/localhealth.png)
+
+EC2에서 실행:
+![img_2.png](images/ec2health.png)
