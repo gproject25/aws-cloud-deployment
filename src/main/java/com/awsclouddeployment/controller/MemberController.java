@@ -13,6 +13,7 @@ import com.awsclouddeployment.dto.MemberResponse;
 import com.awsclouddeployment.dto.MemberSaveRequest;
 import com.awsclouddeployment.service.MemberService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -22,7 +23,7 @@ public class MemberController {
 	private final MemberService memberService;
 
 	@PostMapping
-	public ResponseEntity<MemberResponse> saveMember(@RequestBody MemberSaveRequest request){
+	public ResponseEntity<MemberResponse> saveMember(@Valid @RequestBody MemberSaveRequest request){
 		return ResponseEntity.status(HttpStatus.CREATED).body(memberService.saveMember(request));
 	}
 
