@@ -25,14 +25,14 @@ public class GlobalExceptionHandler {
 		MissingServletRequestParameterException.class
 	})
 	public ResponseEntity<ErrorResponse> handleHttpFormatException(HttpServletRequest request, Exception e) {
-		printWarnLog(request, e.getMessage());
+		printErrorLog(request, e);
 		return buildResponseEntity(ErrorCode.REQUEST_FORMAT_INVALID, null);
 
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ErrorResponse> handleValidationException(HttpServletRequest request, MethodArgumentNotValidException e) {
-		printWarnLog(request, e.getMessage());
+		printErrorLog(request, e);
 		List<FieldErrorResponse> validationErrors = e.getBindingResult().getFieldErrors().stream().map(error ->
 				new FieldErrorResponse(
 					error.getField(),
@@ -44,26 +44,30 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(MemberNotFoundException.class)
 	public ResponseEntity<ErrorResponse> handleMemberNotFoundException(HttpServletRequest request, MemberNotFoundException e) {
-		printWarnLog(request, e.getMessage());
+		printErrorLog(request, e);
 		return buildResponseEntity(ErrorCode.MEMBER_NOT_FOUND, null);
 	}
 
 	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
 	public ResponseEntity<ErrorResponse> handleMethodNotSupportedException(HttpServletRequest request, HttpRequestMethodNotSupportedException e) {
-		printWarnLog(request, e.getMessage());
+		printErrorLog(request, e);
+
 		return buildResponseEntity(ErrorCode.METHOD_NOT_ALLOWED, null);
 	}
 
 	@ExceptionHandler(NoResourceFoundException.class)
 	public ResponseEntity<ErrorResponse> handleNoResourceFoundException(HttpServletRequest request) {
-		printWarnLog(request, "URL Not Found");
+		log.error("[API - ERROR] {} {}",
+			request.getMethod(),
+			request.getRequestURI()
+		);
 		return buildResponseEntity(ErrorCode.REQUEST_URL_INVALID, null);
 	}
 
 	//default
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ErrorResponse> handleUnexpectedException(HttpServletRequest request, Exception e) {
-		log.error("{} {} - Unexpected error", request.getMethod(), request.getRequestURI(), e);
+		printErrorLog(request, e);
 
 		return buildResponseEntity(ErrorCode.INTERNAL_SERVER_ERROR, null);
 	}
@@ -73,11 +77,12 @@ public class GlobalExceptionHandler {
 
 	}
 
-	private void printWarnLog(HttpServletRequest request, String str) {
-		log.warn("{} {} - {}",
+	private void printErrorLog(HttpServletRequest request, Exception e) {
+		log.error("[API - ERROR] {} {}",
 			request.getMethod(),
 			request.getRequestURI(),
-			str
+			e
 		);
 	}
+
 }
