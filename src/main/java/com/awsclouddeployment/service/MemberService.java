@@ -3,6 +3,7 @@ package com.awsclouddeployment.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.awsclouddeployment.common.exception.MemberNotFoundException;
 import com.awsclouddeployment.dto.MemberResponse;
 import com.awsclouddeployment.dto.MemberSaveRequest;
 import com.awsclouddeployment.entity.Member;
@@ -24,7 +25,7 @@ public class MemberService {
 	@Transactional(readOnly = true)
 	public MemberResponse getMember(Long memberId) {
 		Member member = memberRepository.findById(memberId).orElseThrow(
-			() -> new IllegalArgumentException("없는 팀원")
+			() -> new MemberNotFoundException("팀원을 찾을 수 없습니다: " + memberId)
 		);
 		return new MemberResponse(member);
 	}
