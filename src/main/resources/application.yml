@@ -1,3 +1,9 @@
 spring:
   application:
     name: aws-cloud-deployment
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
