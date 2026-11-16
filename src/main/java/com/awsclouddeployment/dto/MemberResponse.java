@@ -3,7 +3,6 @@ package com.awsclouddeployment.dto;
 import com.awsclouddeployment.entity.Member;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Getter
 public class MemberResponse {

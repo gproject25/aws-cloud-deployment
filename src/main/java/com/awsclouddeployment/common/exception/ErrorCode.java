@@ -21,10 +21,25 @@ public enum ErrorCode {
 		HttpStatus.BAD_REQUEST,
 		"URL 경로가 잘못되었습니다."
 	),
-
 	MEMBER_NOT_FOUND(
 		HttpStatus.NOT_FOUND,
-		"회원을 찾을 수 없습니다."
+		"팀원을 찾을 수 없습니다."
+	),
+	FILE_NOT_FOUND(
+		HttpStatus.NOT_FOUND,
+		"파일을 찾을 수 없습니다."
+	),
+	MULTIPART_REQUEST_INVALID(
+		HttpStatus.BAD_REQUEST,
+		"파일 업로드 요청 형식이 잘못되었습니다."
+	),
+	FILE_UPLOAD_FAILED(
+		HttpStatus.INTERNAL_SERVER_ERROR,
+		"파일을 업로드할 수 없습니다."
+	),
+	PROFILE_IMAGE_NOT_FOUND(
+		HttpStatus.NOT_FOUND,
+		"프로필 사진을 찾을 수 없습니다."
 	),
 	METHOD_NOT_ALLOWED(
 		HttpStatus.METHOD_NOT_ALLOWED,
