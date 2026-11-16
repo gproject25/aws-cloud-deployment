@@ -4,9 +4,9 @@ name: CI Pipeline
 # main 브랜치 push 또는 PR
 on:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    branches: [level/challenge]
+  #pull_request:
+    #branches: [main]
 
 # 권한 설정
 permissions:
@@ -115,6 +115,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+      - name: Debug GitHub OIDC claims
+        run: |
+          TOKEN=$(curl -sS \
+          -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+          "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=sts.amazonaws.com" \
+          | jq -r '.value')
+          
+          echo "$TOKEN" | cut -d '.' -f2 | \
+          tr '_-' '/+' | \
+          base64 -d 2>/dev/null | \
+          jq '{iss, aud, sub, repository, ref, environment}'
+
       # AWS 인증 (GitHub OIDC)
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
