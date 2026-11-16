@@ -10,7 +10,13 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+
+import com.awsclouddeployment.common.exception.custom.FileNotFoundException;
+import com.awsclouddeployment.common.exception.custom.FileUploadFailException;
+import com.awsclouddeployment.common.exception.custom.MemberNotFoundException;
+import com.awsclouddeployment.common.exception.custom.ProfileImageNotFoundException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +54,31 @@ public class GlobalExceptionHandler {
 		return buildResponseEntity(ErrorCode.MEMBER_NOT_FOUND, null);
 	}
 
+	@ExceptionHandler(FileUploadFailException.class)
+	public ResponseEntity<ErrorResponse> handleFileUploadException(HttpServletRequest request, FileUploadFailException e) {
+		printErrorLog(request, e);
+		return buildResponseEntity(ErrorCode.FILE_UPLOAD_FAILED, null);
+	}
+
+	@ExceptionHandler(FileNotFoundException.class)
+	public ResponseEntity<ErrorResponse> handleFileNotFoundException(HttpServletRequest request, FileNotFoundException e) {
+		printErrorLog(request, e);
+		return buildResponseEntity(ErrorCode.FILE_NOT_FOUND, null);
+	}
+
+	@ExceptionHandler(MultipartException.class)
+	public ResponseEntity<ErrorResponse> handleMultipartException(HttpServletRequest request, MultipartException e) {
+		printErrorLog(request, e);
+		return buildResponseEntity(ErrorCode.MULTIPART_REQUEST_INVALID, null);
+	}
+
+	@ExceptionHandler(ProfileImageNotFoundException.class)
+	public ResponseEntity<ErrorResponse> handleProfileImageNotFoundException(HttpServletRequest request, ProfileImageNotFoundException e) {
+		printErrorLog(request, e);
+		return buildResponseEntity(ErrorCode.PROFILE_IMAGE_NOT_FOUND, null);
+	}
+
+
 	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
 	public ResponseEntity<ErrorResponse> handleMethodNotSupportedException(HttpServletRequest request, HttpRequestMethodNotSupportedException e) {
 		printErrorLog(request, e);
@@ -74,7 +105,6 @@ public class GlobalExceptionHandler {
 
 	private ResponseEntity<ErrorResponse> buildResponseEntity(ErrorCode errorCode, List<FieldErrorResponse> validationErrors) {
 		return ResponseEntity.status(errorCode.getStatus()).body(new ErrorResponse(errorCode, validationErrors));
-
 	}
 
 	private void printErrorLog(HttpServletRequest request, Exception e) {
