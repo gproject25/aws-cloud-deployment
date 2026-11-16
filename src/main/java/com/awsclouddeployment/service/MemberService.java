@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.awsclouddeployment.common.exception.custom.FileUploadFailException;
 import com.awsclouddeployment.common.exception.custom.MemberNotFoundException;
 import com.awsclouddeployment.common.exception.custom.ProfileImageNotFoundException;
 import com.awsclouddeployment.dto.FileDownloadUrlResponse;
@@ -43,9 +42,6 @@ public class MemberService {
 		Member member = memberRepository.findById(memberId).orElseThrow(
 			() -> new MemberNotFoundException()
 		);
-		if (file == null || file.isEmpty()) {
-			throw new FileUploadFailException();
-		}
 
 		String fileKey = s3Service.upload(memberId, file);
 		member.updateProfileImage(fileKey);

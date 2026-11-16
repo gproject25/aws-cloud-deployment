@@ -41,6 +41,10 @@ public enum ErrorCode {
 		HttpStatus.NOT_FOUND,
 		"프로필 사진을 찾을 수 없습니다."
 	),
+	FILE_URL_GENERATION_FAILED(
+		HttpStatus.INTERNAL_SERVER_ERROR,
+		"이미지 다운로드 URL 생성에 실패했습니다."
+	),
 	METHOD_NOT_ALLOWED(
 		HttpStatus.METHOD_NOT_ALLOWED,
 		"지원하지 않는 HTTP 메서드입니다."

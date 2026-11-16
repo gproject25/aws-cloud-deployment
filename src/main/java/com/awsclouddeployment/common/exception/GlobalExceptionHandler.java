@@ -13,8 +13,8 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import com.awsclouddeployment.common.exception.custom.FileNotFoundException;
 import com.awsclouddeployment.common.exception.custom.FileUploadFailException;
+import com.awsclouddeployment.common.exception.custom.FileUrlGenerationException;
 import com.awsclouddeployment.common.exception.custom.MemberNotFoundException;
 import com.awsclouddeployment.common.exception.custom.ProfileImageNotFoundException;
 
@@ -55,15 +55,9 @@ public class GlobalExceptionHandler {
 	}
 
 	@ExceptionHandler(FileUploadFailException.class)
-	public ResponseEntity<ErrorResponse> handleFileUploadException(HttpServletRequest request, FileUploadFailException e) {
+	public ResponseEntity<ErrorResponse> handleFileUploadFailException(HttpServletRequest request, FileUploadFailException e) {
 		printErrorLog(request, e);
 		return buildResponseEntity(ErrorCode.FILE_UPLOAD_FAILED, null);
-	}
-
-	@ExceptionHandler(FileNotFoundException.class)
-	public ResponseEntity<ErrorResponse> handleFileNotFoundException(HttpServletRequest request, FileNotFoundException e) {
-		printErrorLog(request, e);
-		return buildResponseEntity(ErrorCode.FILE_NOT_FOUND, null);
 	}
 
 	@ExceptionHandler(MultipartException.class)
@@ -78,6 +72,11 @@ public class GlobalExceptionHandler {
 		return buildResponseEntity(ErrorCode.PROFILE_IMAGE_NOT_FOUND, null);
 	}
 
+	@ExceptionHandler(FileUrlGenerationException.class)
+	public ResponseEntity<ErrorResponse> handleFileUrlGenerationException(HttpServletRequest request, FileUrlGenerationException e) {
+		printErrorLog(request, e);
+		return buildResponseEntity(ErrorCode.FILE_URL_GENERATION_FAILED, null);
+	}
 
 	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
 	public ResponseEntity<ErrorResponse> handleMethodNotSupportedException(HttpServletRequest request, HttpRequestMethodNotSupportedException e) {

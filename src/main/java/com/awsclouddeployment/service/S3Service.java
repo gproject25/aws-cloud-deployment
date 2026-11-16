@@ -8,12 +8,13 @@ import java.util.UUID;
 
 import io.awspring.cloud.s3.S3Template;
 import lombok.RequiredArgsConstructor;
+import software.amazon.awssdk.core.exception.SdkException;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.awsclouddeployment.common.exception.ErrorCode;
 import com.awsclouddeployment.common.exception.custom.FileUploadFailException;
+import com.awsclouddeployment.common.exception.custom.FileUrlGenerationException;
 import com.awsclouddeployment.service.s3.S3Properties;
 
 @Service
@@ -35,12 +36,16 @@ public class S3Service {
 
 			return key;
 
-		} catch (IOException e) {
+		} catch (IOException | SdkException e) {
 			throw new FileUploadFailException();
 		}
 	}
 
 	public URL getDownloadUrl(String key) {
-		return s3Template.createSignedGetURL(s3Properties.getBucket(), key, PRESIGNED_URL_EXPIRATION);
+		try{
+			return s3Template.createSignedGetURL(s3Properties.getBucket(), key, PRESIGNED_URL_EXPIRATION);
+		} catch (SdkException e) {
+			throw new FileUrlGenerationException();
+		}
 	}
 }
