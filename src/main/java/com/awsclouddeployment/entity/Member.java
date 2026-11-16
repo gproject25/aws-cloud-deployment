@@ -28,7 +28,7 @@ public class Member {
 	@Column(nullable = false)
 	private String mbti;
 
-	@Column
+	@Column(name = "profile_image_key")
 	private String profileImageKey;
 
 	public Member(String name, int age, String mbti){
