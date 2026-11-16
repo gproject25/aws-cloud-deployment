@@ -47,23 +47,12 @@ jobs:
           test -n "$JAR_FILE"
           cp "$JAR_FILE" app.jar
 
-      - name: Verify Docker Hub secrets
+      - name: Check Docker Hub username
         if: github.event_name == 'push'
         env:
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
         run: |
-          if [ -z "$DOCKERHUB_USERNAME" ]; then
-            echo "::error::DOCKERHUB_USERNAME is empty or unavailable"
-            exit 1
-          fi
-
-          if [ -z "$DOCKERHUB_TOKEN" ]; then
-            echo "::error::DOCKERHUB_TOKEN is empty or unavailable"
-            exit 1
-          fi
-
-          echo "Both Docker Hub secrets are available."
+          echo "Docker Hub username: $USERNAME"
 
       # Step 7: Docker Hub 로그인 (main push일 때만)
       - name: Login to Docker Hub
