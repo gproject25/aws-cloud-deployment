@@ -62,7 +62,7 @@ S3 저장:
 ### Level 4. Docker & CI/CD 파이프라인
 
 Github Actions Workflow
-![img.png](images/DockerHubCIWorkflow.png)
+![img.png](images/CICDWorkflow.png)
 
 EC2 Docker Container 실행 확인:
 ![DockerHubCD.png](images/DockerHubCD.png)
