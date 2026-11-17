@@ -117,7 +117,7 @@ jobs:
 
           echo "Deployment command: $COMMAND_ID"
 
-        # 최대 약 5분 동안 5초마다 상태 확인
+          # 최대 약 5분 동안 5초마다 상태 확인
           STATUS="Pending"
 
           for i in $(seq 1 60); do
