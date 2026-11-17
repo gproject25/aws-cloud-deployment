@@ -42,19 +42,20 @@ jobs:
       - name: Build and test
         run: ./gradlew build
 
-      # EC2가 ARM(arm64)이므로 amd64 + arm64 멀티 아키텍처 이미지를 만들기 위해 필요
+      # ARM64 멀티 아키텍처 빌드 지원
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # 스모크 테스트용 이미지 (러너 아키텍처인 amd64로 빌드해서 바로 실행)
+      # 스모크 테스트용 AMD64 이미지 빌드
       - name: Build Docker image for test
         uses: docker/build-push-action@v6
         with:
           context: .
           load: true
+          platforms: linux/amd64
           tags: ${{ env.IMAGE }}
 
       # 앱이 정상적으로 시작될 때까지 최대 약 60초 대기
@@ -65,14 +66,10 @@ jobs:
             -e SPRING_PROFILES_ACTIVE=local \
             "$IMAGE"
 
-          curl -fsS --retry 30 --retry-delay 2 --retry-connrefused --retry-all-errors \
+          curl -fsS --retry 30 --retry-delay 2 \
+            --retry-connrefused --retry-all-errors \
             http://localhost:8080/actuator/health \
             || { docker logs smoke-test; exit 1; }
-
-      # 테스트 컨테이너 정리
-      - name: Cleanup test container
-        if: always()
-        run: docker rm -f smoke-test || true
 
       # 외부 fork PR에서는 Secrets에 접근할 수 없으므로 로그인 생략
       - name: Login to Docker Hub
@@ -82,7 +79,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # main push에서만 멀티 아키텍처 이미지 push (EC2는 arm64를 pull)
+      # main push에서만 멀티 아키텍처 이미지 push
       - name: Build and push multi-arch image
         if: github.event_name == 'push'
         uses: docker/build-push-action@v6
@@ -114,20 +111,77 @@ jobs:
           aws-region: ap-northeast-2
 
       # SSM Run Command를 통해 Private EC2에 배포
+      # 헬스 체크 실패 시 이전 이미지로 자동 롤백
       - name: Deploy to EC2 via SSM
         run: |
+          # EC2에서 실행할 배포 스크립트
+          cat > deploy.sh << 'SCRIPT'
+          set -e
+
+          NAME=aws-cloud-deployment
+          RUN_ARGS="-d --name $NAME -p 8080:8080 --restart unless-stopped -e SPRING_PROFILES_ACTIVE=prod -e AWS_REGION=ap-northeast-2"
+
+          # 1. 현재 실행 중인 이미지 기억
+          PREV=$(docker inspect --format '{{.Config.Image}}' "$NAME" 2>/dev/null || true)
+
+          # 2. 새 이미지 다운로드
+          docker pull "$IMAGE"
+
+          # 3. 기존 컨테이너 제거
+          docker rm -f "$NAME" || true
+
+          # 4. 새 컨테이너 실행
+          if ! docker run $RUN_ARGS "$IMAGE"; then
+              echo "Failed to start new container. Rolling back..."
+
+              if [ -n "$PREV" ]; then
+                  docker run $RUN_ARGS "$PREV"
+                  echo "Rolled back to $PREV"
+              else
+                  echo "No previous image available."
+              fi
+
+              exit 1
+          fi
+
+          # 5. 애플리케이션 헬스 체크
+          if curl -fsS --retry 30 --retry-delay 2 \
+              --retry-connrefused --retry-all-errors \
+              http://localhost:8080/actuator/health; then
+
+              echo "Deployment successful!"
+              docker ps
+
+              # 6. 배포 성공 후 사용하지 않는 이미지 정리
+              docker image prune -af
+              exit 0
+          fi
+
+          # 7. 헬스 체크 실패 시 롤백
+          echo "Health check failed. Rolling back..."
+
+          docker logs "$NAME" || true
+          docker rm -f "$NAME" || true
+
+          if [ -n "$PREV" ]; then
+              docker run $RUN_ARGS "$PREV"
+              echo "Rolled back to $PREV"
+          else
+              echo "No previous image available for rollback."
+          fi
+
+          exit 1
+          SCRIPT
+
+          # IMAGE와 배포 스크립트를 하나의 SSM 명령으로 전달
+          PARAMS=$(jq -n --arg image "$IMAGE" --rawfile script deploy.sh \
+            '{commands: [("IMAGE=\($image)\n" + $script)]}')
+
+          # SSM 명령 실행
           COMMAND_ID=$(aws ssm send-command \
             --instance-ids "$EC2_INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
-            --parameters 'commands=[
-              "set -e",
-              "docker pull ${{ env.IMAGE }}",
-              "docker rm -f aws-cloud-deployment || true",
-              "docker run -d --name aws-cloud-deployment -p 8080:8080 --restart unless-stopped -e SPRING_PROFILES_ACTIVE=prod -e AWS_REGION=ap-northeast-2 ${{ env.IMAGE }}",
-              "docker ps",
-              "curl -fsS --retry 30 --retry-delay 2 --retry-connrefused --retry-all-errors http://localhost:8080/actuator/health",
-              "docker image prune -af"
-            ]' \
+            --parameters "$PARAMS" \
             --query "Command.CommandId" \
             --output text)
 
@@ -143,7 +197,7 @@ jobs:
               --query "Status" \
               --output text 2>/dev/null || true)
 
-            echo "Deployment status: ${STATUS:-Pending}"
+            echo "Deployment status: $STATUS"
 
             case "$STATUS" in
               Success|Failed|TimedOut|Cancelled)
@@ -154,12 +208,14 @@ jobs:
             sleep 5
           done
 
-          # 성공/실패와 관계없이 실행 로그 출력
+          # 실행 로그 출력
           aws ssm get-command-invocation \
             --command-id "$COMMAND_ID" \
             --instance-id "$EC2_INSTANCE_ID" \
             --query "[StandardOutputContent, StandardErrorContent]" \
             --output text
 
-          # Success가 아니면 workflow 실패 처리
-          [ "$STATUS" = "Success" ]
+          # 배포 실패 시 GitHub Actions도 실패 처리
+          if [ "$STATUS" != "Success" ]; then
+            exit 1
+          fi
