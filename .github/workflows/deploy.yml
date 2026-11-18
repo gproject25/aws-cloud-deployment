@@ -87,7 +87,9 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ env.IMAGE }}
+          tags: |
+            ${{ env.IMAGE }}
+            gproject25/aws-cloud-deployment:latest
 
   deploy:
     name: Deploy to EC2
