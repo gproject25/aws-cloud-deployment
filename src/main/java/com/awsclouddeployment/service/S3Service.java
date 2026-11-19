@@ -13,6 +13,7 @@ import software.amazon.awssdk.core.exception.SdkException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.awsclouddeployment.common.exception.custom.FileDeleteFailException;
 import com.awsclouddeployment.common.exception.custom.FileUploadFailException;
 import com.awsclouddeployment.common.exception.custom.FileUrlGenerationException;
 import com.awsclouddeployment.service.AWSProperties.CloudFrontProperties;
@@ -40,6 +41,13 @@ public class S3Service {
 
 		} catch (IOException | SdkException e) {
 			throw new FileUploadFailException();
+		}
+	}
+	public void deleteFile(String key) {
+		try {
+			s3Template.deleteObject(s3Properties.getBucket(), key);
+		} catch (SdkException e) {
+			throw new FileDeleteFailException();
 		}
 	}
 
