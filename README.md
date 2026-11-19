@@ -70,6 +70,14 @@ EC2 Docker Container 실행 확인:
 ---
 ### Level 5. 고가용성 아키텍처
 
+HTTPS 적용된 도메인 URL
+https://api.spring6gproject.click/actuator/health
+https://spring6gproject.click/api/members/1
+![img.png](images/domainTest.png)
+
+Target Group
+![img.png](images/tg.png)
+
 ---
 
 ### Level 6. CloudFront CDN
