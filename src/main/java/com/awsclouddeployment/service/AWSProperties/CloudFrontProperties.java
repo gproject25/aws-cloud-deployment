@@ -1,4 +1,4 @@
-package com.awsclouddeployment.service.s3;
+package com.awsclouddeployment.service.AWSProperties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

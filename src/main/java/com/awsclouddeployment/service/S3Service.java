@@ -15,8 +15,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.awsclouddeployment.common.exception.custom.FileUploadFailException;
 import com.awsclouddeployment.common.exception.custom.FileUrlGenerationException;
-import com.awsclouddeployment.service.s3.CloudFrontProperties;
-import com.awsclouddeployment.service.s3.S3Properties;
+import com.awsclouddeployment.service.AWSProperties.CloudFrontProperties;
+import com.awsclouddeployment.service.AWSProperties.S3Properties;
 
 @Service
 @RequiredArgsConstructor
