@@ -15,7 +15,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.awsclouddeployment.common.exception.custom.FileUploadFailException;
 import com.awsclouddeployment.common.exception.custom.FileUrlGenerationException;
-import com.awsclouddeployment.service.s3.S3Properties;
+import com.awsclouddeployment.service.AWSProperties.CloudFrontProperties;
+import com.awsclouddeployment.service.AWSProperties.S3Properties;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +24,7 @@ public class S3Service {
 
 	private final S3Template s3Template;
 	private final S3Properties s3Properties;
+	private final CloudFrontProperties cloudFrontProperties;
 
 	private static final Duration PRESIGNED_URL_EXPIRATION = Duration.ofDays(7);
 
@@ -41,11 +43,15 @@ public class S3Service {
 		}
 	}
 
-	public URL getDownloadUrl(String key) {
+	public URL getPresignedUrl(String key) {
 		try{
 			return s3Template.createSignedGetURL(s3Properties.getBucket(), key, PRESIGNED_URL_EXPIRATION);
 		} catch (SdkException e) {
 			throw new FileUrlGenerationException();
 		}
+	}
+
+	public String getCloudfrontUrl(String key) {
+		return cloudFrontProperties.getDomain() + "/" + key;
 	}
 }

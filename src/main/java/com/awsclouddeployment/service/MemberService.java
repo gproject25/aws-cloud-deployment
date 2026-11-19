@@ -55,10 +55,15 @@ public class MemberService {
 		);
 
 		String fileKey = member.getProfileImageKey();
-		if(fileKey == null){
+		if (fileKey == null) {
 			throw new ProfileImageNotFoundException();
 		}
-		URL downloadUrl = s3Service.getDownloadUrl(fileKey);
-		return new FileDownloadUrlResponse(downloadUrl.toString());
+
+		//Presigned 방식:
+		//URL downloadUrl = s3Service.getPresignedUrl(filekey);
+
+		//CloudFront 방식:
+		String downloadUrl = s3Service.getCloudfrontUrl(fileKey);
+		return new FileDownloadUrlResponse(downloadUrl);
 	}
 }
