@@ -1,0 +1,27 @@
+package com.awsclouddeployment.listener;
+
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
+
+import com.awsclouddeployment.common.exception.custom.FileDeleteFailException;
+import com.awsclouddeployment.service.S3Service;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class ProfileImageEventListener {
+	private final S3Service s3Service;
+
+	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	public void handleProfileImageReplaced(ProfileImageReplacedEvent event){
+		try {
+			s3Service.deleteFile(event.oldImageKey());
+		} catch (FileDeleteFailException e) {
+			log.error("파일 삭제를 실패했습니다. {}", event.oldImageKey(), e);
+		}
+	}
+}
