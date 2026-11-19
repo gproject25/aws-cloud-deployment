@@ -1,0 +1,30 @@
+spring:
+  config:
+    import: "aws-parameterstore:/spring-cloud/prod/"
+
+  datasource:
+    url: ${db.url}
+    username: ${db.username}
+    password: ${db.password}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+info:
+  team-name: ${team-name}
+
+
+management:
+  info:
+    env:
+      enabled: true
+
+logging:
+  level:
+    root: INFO
+
+app:
+  aws:
+    s3:
+      bucket: spring-cloud-gproject-files

@@ -38,4 +38,3 @@ out/
 
 # Local and Production Configuration
 application-local.yml
-application-prod.yml
