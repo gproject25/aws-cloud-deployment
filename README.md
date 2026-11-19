@@ -66,3 +66,16 @@ Github Actions Workflow
 
 EC2 Docker Container 실행 확인:
 ![DockerHubCD.png](images/DockerHubCD.png)
+
+---
+### Level 5. 고가용성 아키텍처
+
+---
+
+### Level 6. CloudFront CDN
+
+CloudFront Image URL: https://d1t2ufqdn6a77o.cloudfront.net/profile-images/1/a1b735d5-e425-4c46-9671-124dfc65ef62_raccoon_animal_underwater_1343115_1920x1080.jpg
+
+![img.png](images/profilepic2.png)
+
+---
