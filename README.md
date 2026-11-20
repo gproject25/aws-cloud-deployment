@@ -160,8 +160,11 @@ S3의 프로필 이미지를 CloudFront를 통해 제공하도록 구성 ->
 
 이미지가 가까운 엣지 로케이션에서 캐싱되어 응답이 빨라지고, S3를 직접 노출하지 않고도 이미지를 제공할 수 있음.
 
-CloudFront Image
+**CloudFront Image**
 URL: https://d1t2ufqdn6a77o.cloudfront.net/profile-images/1/a1b735d5-e425-4c46-9671-124dfc65ef62_raccoon_animal_underwater_1343115_1920x1080.jpg
+
+**커스텀 도메인**
+URL: https://images.spring6gproject.click/profile-images/1/a1b735d5-e425-4c46-9671-124dfc65ef62_raccoon_animal_underwater_1343115_1920x1080.jpg
 
 ![img.png](images/profilepic2.png)
 
