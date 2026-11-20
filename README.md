@@ -111,8 +111,6 @@ S3 저장:
 
 ![DockerHubCD.png](images/DockerHubCD.png)
 
-![img.png](images/dockertest.png)
-
 ---
 ### Level 5. 고가용성 아키텍처
 
