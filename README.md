@@ -94,7 +94,7 @@ EC2에서 접근 성공 (Upload, Download):
 
 S3 저장:
 
-[img.png](images/S3_Bucket.png)
+![img.png](images/S3_Bucket.png)
 
 ---
 
