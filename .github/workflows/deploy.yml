@@ -21,7 +21,7 @@ jobs:
   build:
     name: Build, Test and Push
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     permissions:
       contents: read
 
@@ -38,9 +38,9 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      # 테스트 + JAR 빌드
-      - name: Build and test
-        run: ./gradlew build
+      # 테스트만 실행 (JAR 빌드는 Dockerfile에서 수행)
+      - name: Test with Gradle
+        run: ./gradlew test
 
       # ARM64 멀티 아키텍처 빌드 지원
       - name: Set up QEMU
