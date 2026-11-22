@@ -44,8 +44,8 @@ method: POST
 
 | 이름 | 데이터타입 | 필수 | 설명 |
 |---|---|---|---|
-| name | String | Y | 회원 이름. 공백만 있거나 비어 있으면 안 된다. 최대 길이·중복 허용 여부는 결정 필요 |
-| age | Integer | Y | 나이. 1 이상 150 이하. 코드상 `int` 라서 누락 시 0 으로 처리되어 최솟값 검증에 실패한다. 최댓값 경계는 결정 필요 |
+| name | String | Y | 회원 이름. 공백만 있거나 비어 있으면 안 된다. 최대 50자. 중복 허용 여부는 결정 필요 |
+| age | Integer | Y | 나이. 1 이상 150 이하. 누락(null) 시 필수 입력 오류 |
 | mbti | String | Y | MBTI 16유형 중 하나(`ISTJ`, `ISFJ`, `INFJ`, `INTJ`, `ISTP`, `ISFP`, `INFP`, `INTP`, `ESTP`, `ESFP`, `ENFP`, `ENTP`, `ESTJ`, `ESFJ`, `ENFJ`, `ENTJ`). 대문자만 허용 |
 
 # 03. 응답(Response)
@@ -97,13 +97,28 @@ method: POST
 | field | 조건 | message |
 |---|---|---|
 | name | null, 빈 문자열, 공백만 있음 | 이름은 필수 입력 항목입니다. |
-| age | 1 미만 (누락 포함) | 나이는 1살 이상이어야 합니다. |
-| age | 150 초과 | 나이는 150살 미만이어야 합니다. |
-| mbti | null, 빈 문자열, 공백만 있음 | `@NotBlank` 에 메시지가 지정되지 않아 Bean Validation 기본 메시지(예: `must not be blank`)가 사용됨. 서버 로케일에 따라 달라질 수 있음 |
+| name | 50자 초과 | 이름은 50자 이하여야 합니다. |
+| age | null (누락 포함) | 나이는 필수 입력 항목입니다. |
+| age | 1 미만 | 나이는 1살 이상이어야 합니다. |
+| age | 150 초과 | 나이는 150살 이하여야 합니다. |
+| mbti | null, 빈 문자열 | MBTI는 필수 입력 항목입니다. |
+| mbti | 공백만 있음 | MBTI는 필수 입력 항목입니다. 와 올바른 MBTI 유형을 입력해주세요. (2건) |
 | mbti | 16유형에 해당하지 않음 (소문자 포함) | 올바른 MBTI 유형을 입력해주세요. |
 
-- 빈 문자열/공백 `mbti` 는 `NotBlank` 와 `Pattern` 이 모두 실패하므로 같은 field 에 에러 2건이 포함될 수 있다.
+- 정규식이 빈 문자열을 허용하므로 빈 문자열 `mbti` 는 `@NotBlank` 에러 1건만 나온다. null 도 1건이다.
+- 공백만 있는 `mbti`(예: `" "`)는 `@NotBlank` 와 `@Pattern` 이 모두 실패해 같은 field 에 에러 2건이 포함된다.
 - `validationErrors` 의 순서는 보장되지 않는다.
+
+**에러 응답:** `415 Unsupported Media Type` — `Content-Type` 이 `application/json` 이 아닐 때
+
+```json
+{
+  "status": 415,
+  "code": "UNSUPPORTED_MEDIA_TYPE",
+  "message": "지원하지 않는 Content-Type입니다.",
+  "timestamp": "2026-11-17T10:00:00"
+}
+```
 
 **에러 응답:** `400 Bad Request` — 요청 본문이 없거나 JSON 형식이 잘못되었을 때, 또는 필드 타입이 맞지 않을 때 (예: `age` 가 문자열)
 
