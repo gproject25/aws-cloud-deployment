@@ -38,3 +38,7 @@ out/
 
 # Local and Production Configuration
 application-local.yml
+
+#AI Agent Log
+.claude/settings.local.json
+logs/*.log
