@@ -14,6 +14,22 @@ AWS 기반의 클라우드 인프라를 설계하고 Spring Boot 애플리케이
 
 ---
 
+## 📑 API 명세서
+
+API 명세서는 Claude Code의 `planner` 에이전트가 구현된 코드를 읽고 초안을 작성
+
+- 작성된 명세는 PR로 올라오며, 사람이 "결정 필요" 항목을 확인하고 리뷰한 뒤 머지
+- 에이전트는 `docs/api/` 안의 파일만 수정하고, 작업 규칙은 `CLAUDE.md` 와 `docs/api/README.md`를 활용
+
+
+- **API 명세서 바로가기**
+    - Save Member [API](./docs/api/save-member.md)
+    - Get Member [API](./docs/api/get-member.md)
+    - Upload Profile Image [API](./docs/api/upload-profile-image.md)
+    - Get Profile Image [API](./docs/api/get-profile-image.md)
+
+---
+
 ### Level 0. AWS Budget 설정
 
 예상치 못한 과금을 막기 위해 AWS Budgets로 월 예산과 알림 임계값을 설정.
