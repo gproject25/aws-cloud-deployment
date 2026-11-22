@@ -19,7 +19,7 @@ public class Member {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false)
+	@Column(nullable = false, length = 50)
 	private String name;
 
 	@Column(nullable = false)
@@ -31,13 +31,13 @@ public class Member {
 	@Column(name = "profile_image_key")
 	private String profileImageKey;
 
-	public Member(String name, int age, String mbti){
+	public Member(String name, int age, String mbti) {
 		this.name = name;
 		this.age = age;
 		this.mbti = mbti;
 	}
 
-	public void updateProfileImage(String profileImageKey){
+	public void updateProfileImage(String profileImageKey) {
 		this.profileImageKey = profileImageKey;
 	}
 }

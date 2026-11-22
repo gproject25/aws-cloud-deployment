@@ -25,7 +25,8 @@
 - 성공 응답 상태 코드: 생성(POST)은 `201 Created`, 조회·수정은 `200 OK`, 삭제는 `204 No Content` 를 쓴다.
 - 이미 구현된 API는 코드와 이 규칙이 다르면 코드 기준으로 쓰고, 다른 부분을 PR 본문에 적는다.
 - 파일 업로드 API는 request headers 에 `Content-Type: multipart/form-data` 를 적고, request body 는 JSON 대신 폼 필드(`file` 등) 표로 적는다.
-- 에러 응답은 `{ "status", "code", "message", "timestamp" }` 형식으로, 상황별로 하나씩 적는다. `code` 는 `ErrorCode` 의 이름이다.
+- 에러 응답은 `{ "status", "code", "message", "timestamp" }` 형식으로, 상황별로 하나씩 적는다. `code` 와 `message` 는 `ErrorCode` 의 이름과 메시지를
+  그대로 쓴다. 템플릿의 예시 값은 형식 예시이므로 실제 값과 달라도 차이로 적지 않는다.
 - 입력 검증이 필요한 API는 `400 Bad Request` 에러 응답도 적는다. 이때는 `validationErrors`(`field`, `message`) 가 추가된다. 검증 규칙이 요구사항에 없으면
   `결정 필요` 로 둔다.
 - 날짜·시간은 ISO 8601 문자열(`2026-11-17T10:00:00`)로 쓴다.
@@ -73,7 +74,7 @@ method: <GET | POST | PATCH | PUT | DELETE>
 
 ```json
 {
-  "name": "gygim"
+  "name": "juhan"
 }
 ```
 
@@ -111,7 +112,7 @@ method: <GET | POST | PATCH | PUT | DELETE>
 {
   "status": 404,
   "code": "MEMBER_NOT_FOUND",
-  "message": "member not found",
+  "message": "팀원을 찾을 수 없습니다.",
   "timestamp": "2026-11-17T10:00:00"
 }
 ```
@@ -121,8 +122,8 @@ method: <GET | POST | PATCH | PUT | DELETE>
 ```json
 {
   "status": 400,
-  "code": "INVALID_INPUT",
-  "message": "invalid input",
+  "code": "REQUEST_VALIDATION_FAILED",
+  "message": "요청 데이터 검증에 실패했습니다.",
   "timestamp": "2026-11-17T10:00:00",
   "validationErrors": [
     { "field": "name", "message": "must not be blank" }
