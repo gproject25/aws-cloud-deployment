@@ -4,7 +4,7 @@
 
 AWS 기반의 클라우드 인프라를 설계하고 Spring Boot 애플리케이션을 배포하는 실습 프로젝트!
 
-#### 기능 구현 과정: [Notion](https://bolder-shrimp-6f4.notion.site/_-417df7a8441c80f389b6d4355f69498f?pvs=73)
+#### 기능 구현 과정 및 트러블슈팅: [Notion](https://bolder-shrimp-6f4.notion.site/_-417df7a8441c80f389b6d4355f69498f?pvs=73)
 
 #### 프로젝트 기록: [Velog](https://velog.io/@juhan913/posts)
 
