@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.awsclouddeployment.common.annotations.S3PerformanceLog;
 import com.awsclouddeployment.common.exception.custom.FileDeleteFailException;
 import com.awsclouddeployment.common.exception.custom.MemberNotFoundException;
 import com.awsclouddeployment.common.exception.custom.ProfileImageNotFoundException;
@@ -14,6 +15,7 @@ import com.awsclouddeployment.dto.FileUploadResponse;
 import com.awsclouddeployment.dto.MemberResponse;
 import com.awsclouddeployment.dto.MemberSaveRequest;
 import com.awsclouddeployment.entity.Member;
+import com.awsclouddeployment.entity.enums.Mbti;
 import com.awsclouddeployment.listener.ProfileImageReplacedEvent;
 import com.awsclouddeployment.repository.MemberRepository;
 
@@ -29,19 +31,18 @@ public class MemberService {
 
 	@Transactional
 	public MemberResponse saveMember(MemberSaveRequest request) {
-		Member member = new Member(request.getName(), request.getAge(), request.getMbti());
+		Member member = new Member(request.getName(), request.getAge(), Mbti.valueOf(request.getMbti()));
 		return new MemberResponse(memberRepository.save(member));
 	}
 
 	@Transactional(readOnly = true)
 	public MemberResponse getMember(Long memberId) {
-		Member member = memberRepository.findById(memberId).orElseThrow(
-			() -> new MemberNotFoundException()
-		);
+		Member member = findMemberById(memberId);
 		return new MemberResponse(member);
 	}
 
 	//@Transactional
+	@S3PerformanceLog
 	public FileUploadResponse uploadProfileImage(Long memberId, MultipartFile file) {
 		if (!memberRepository.existsById(memberId)) {
 			throw new MemberNotFoundException();
@@ -76,12 +77,10 @@ public class MemberService {
 		return new FileUploadResponse(file.getOriginalFilename(), fileKey);
 	}
 
+	@S3PerformanceLog
 	@Transactional(readOnly = true)
 	public FileDownloadUrlResponse getProfileImage(Long memberId) {
-		Member member = memberRepository.findById(memberId).orElseThrow(
-			() -> new MemberNotFoundException()
-		);
-
+		Member member = findMemberById(memberId);
 		String fileKey = member.getProfileImageKey();
 		if (fileKey == null) {
 			throw new ProfileImageNotFoundException();
@@ -94,5 +93,11 @@ public class MemberService {
 		//CloudFront 방식:
 		String downloadUrl = s3Service.getCloudfrontUrl(fileKey);
 		return new FileDownloadUrlResponse(downloadUrl);
+	}
+
+	private Member findMemberById(Long memberId) {
+		return memberRepository.findById(memberId).orElseThrow(
+			() -> new MemberNotFoundException()
+		);
 	}
 }
