@@ -123,7 +123,7 @@ public class GlobalExceptionHandler {
 	}
 
 	private void printErrorLog(HttpServletRequest request, Exception e) {
-		log.error("[API - ERROR] {} {}",
+		log.error("[API - ERROR] {} {} - failed",
 			request.getMethod(),
 			request.getRequestURI(),
 			e
